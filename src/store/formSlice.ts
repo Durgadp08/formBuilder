@@ -1,7 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { FieldType, FormState } from "./form.types";
+import type { FieldType, Form } from "./form.types";
 
-const initialState: FormState = {
+const initialState: Form = {
+  name: "",
   fields: [],
 };
 
@@ -9,6 +10,9 @@ const formState = createSlice({
   name: "form",
   initialState,
   reducers: {
+    createForm: (state, action: PayloadAction<{ name: string }>) => {
+      state.name = action.payload.name;
+    },
     addField: (
       state,
       action: PayloadAction<{ type: FieldType; label?: string }>
@@ -18,7 +22,9 @@ const formState = createSlice({
         type: action.payload.type,
         label: action.payload.label ?? "",
         value: "",
+        placeholder: "",
         required: false,
+        description: "",
       });
     },
     removeField: (state, action: PayloadAction<number>) => {
@@ -55,6 +61,7 @@ const formState = createSlice({
 });
 
 export const {
+  createForm,
   addField,
   updateFieldLabel,
   removeField,
