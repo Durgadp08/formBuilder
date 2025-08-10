@@ -14,7 +14,7 @@ const FormButtonsSideBar = () => {
       container
       rowSpacing={3}
       columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-      sx={{ backgroundColor: "#F8F8F9" ,p:1 }}
+      sx={{ backgroundColor: "#F8F8F9", p: 1 }}
     >
       <Grid size={12}>
         <Box display="flex" gap={2}>

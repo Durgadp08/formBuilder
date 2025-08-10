@@ -1,9 +1,18 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { FieldType, Form } from "./form.types";
+import type {
+  FieldOption,
+  FieldType,
+  FieldValidations,
+  Form,
+  FormField,
+} from "./form.types";
+import { v4 as uuidv4 } from "uuid";
 
 const initialState: Form = {
   name: "",
   fields: [],
+  selectedId: "",
+  isSaved: false,
 };
 
 const formState = createSlice({
@@ -13,49 +22,77 @@ const formState = createSlice({
     createForm: (state, action: PayloadAction<{ name: string }>) => {
       state.name = action.payload.name;
     },
+
     addField: (
       state,
       action: PayloadAction<{ type: FieldType; label?: string }>
     ) => {
       state.fields.push({
-        id: Date.now(),
+        id: uuidv4(),
         type: action.payload.type,
         label: action.payload.label ?? "",
         value: "",
         placeholder: "",
-        required: false,
         description: "",
+        validations: {},
       });
     },
-    removeField: (state, action: PayloadAction<number>) => {
+    saveForm: (state) => {
+      state.isSaved = true;
+    },
+
+    updateSelectedId: (state, action: PayloadAction<string>) => {
+      state.selectedId = action.payload;
+    },
+
+    removeField: (state, action: PayloadAction<string>) => {
       state.fields = state.fields.filter((field) => field.id != action.payload);
     },
-    updateFieldValue: (
-      state,
-      action: PayloadAction<{ id: number; value: string }>
-    ) => {
-      const field = state.fields.find(
-        (field) => field.id === action.payload.id
-      );
-      if (field) field.value = action.payload.value;
+
+    clearFields: (state) => {
+      state.fields = [];
     },
-    updateFieldLabel: (
+
+    updateFieldValidations: (
       state,
-      action: PayloadAction<{ id: number; label: string }>
+      action: PayloadAction<{ id: string; validations: FieldValidations }>
     ) => {
-      const field = state.fields.find(
-        (field) => field.id === action.payload.id
-      );
-      if (field) field.label = action.payload.label;
+      const field = state.fields.find((f) => f.id === action.payload.id);
+      if (field) {
+        field.validations = {
+          ...field.validations,
+          ...action.payload.validations,
+        };
+      }
     },
-    updateRequired: (
+
+    updateField: (state, action: PayloadAction<FormField>) => {
+      const index = state.fields.findIndex((f) => f.id === action.payload.id);
+      if (index !== -1) {
+        state.fields[index] = action.payload;
+      }
+    },
+
+    addOption: (
       state,
-      action: PayloadAction<{ id: number; required: boolean }>
+      action: PayloadAction<{ fieldId: string; option: FieldOption }>
     ) => {
-      const field = state.fields.find(
-        (field) => field.id === action.payload.id
-      );
-      if (field) field.required = action.payload.required;
+      const field = state.fields.find((f) => f.id === action.payload.fieldId);
+      if (field) {
+        if (!field.options) field.options = [];
+        field.options.push(action.payload.option);
+      }
+    },
+    removeOption: (
+      state,
+      action: PayloadAction<{ fieldId: string; optionId: string }>
+    ) => {
+      const field = state.fields.find((f) => f.id === action.payload.fieldId);
+      if (field && field.options) {
+        field.options = field.options.filter(
+          (o) => o.id !== action.payload.optionId
+        );
+      }
     },
   },
 });
@@ -63,10 +100,14 @@ const formState = createSlice({
 export const {
   createForm,
   addField,
-  updateFieldLabel,
   removeField,
-  updateFieldValue,
-  updateRequired,
+  updateSelectedId,
+  updateField,
+  clearFields,
+  removeOption,
+  addOption,
+  saveForm,
+  updateFieldValidations,
 } = formState.actions;
 
 export default formState.reducer;

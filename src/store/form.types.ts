@@ -3,25 +3,42 @@ export type FieldType =
   | "date"
   | "textarea"
   | "number"
-  | "date"
   | "radio"
   | "select"
   | "checkbox";
 
-export type FormField = {
-  id: number;
-  type: FieldType;
+export interface FieldOption {
+  id: string;
   label: string;
   value: string;
-  placeholder: string;
-  description: string;
-  required: boolean;
-  options?: string[];
+}
+
+export interface FieldValidations {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  minValue?: number;
+  maxValue?: number;
+  pattern?: string;
+}
+
+export type FormField = {
+  id: string;
+  type: FieldType;
+  label: string;
+  placeholder?: string;
+  value?: string;
+  description?: string;
+  required?: boolean;
+  validations: FieldValidations;
+  options?: FieldOption[];
 };
 
 export type Form = {
+  isSaved: boolean;
   name: string;
   fields: FormField[];
+  selectedId: string;
 };
 
 export type FormState = {

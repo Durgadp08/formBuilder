@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./components/layout";
 import Create from "./components/create";
 import Preview from "./components/preview";
@@ -21,10 +26,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route path="/create" element={<Create />} />
-            <Route path="/preview" element={<Preview />} />
-            <Route path="/myforms" element={<Myform />} />
-            <Route />
+            <Route index element={<Navigate to="/create" replace />} />
+            <Route path="create" element={<Create />} />
+            <Route path="preview" element={<Preview />} />
+            <Route path="myforms" element={<Myform />} />
           </Route>
         </Routes>
       </Router>

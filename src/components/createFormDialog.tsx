@@ -9,31 +9,49 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import type { AppDispatch } from "../store/store";
-import { createForm } from "../store/formSlice";
+import { createForm, saveForm } from "../store/formSlice";
+import { saveFormToLocalStorage } from "../store/localstorage";
+import useMyForm from "../hooks/useMyForm";
+import { v4 as uuidv4 } from "uuid";
 
-const CreateFormDialog = () => {
-  const navigate = useNavigate();
+type Props = {
+  open: boolean;
+  handleClose: (arg0: boolean) => void;
+};
+
+const CreateFormDialog = ({ open, handleClose }: Props) => {
   const disptach = useDispatch<AppDispatch>();
 
-  const [open, setOpen] = useState(true);
+  const { fields } = useMyForm();
+
   const [name, setName] = useState("");
   const [error, setError] = useState(false);
+
   const handleCloseDialog = () => {
-    navigate("/");
-    setOpen(false);
-  };
-  const handleCancel = () => {
-    navigate("/");
+    handleClose(false);
   };
 
-  const handleCreate = () => {
-    if (name.length == 0) setError(true);
-    else {
-      disptach(createForm({ name }));
-      setOpen(false);
+  const handleCancel = () => {
+    handleClose(false);
+  };
+
+  const handleSaveForm = () => {
+    if (!name.trim()) {
+      setError(true);
+      return;
     }
+    saveFormToLocalStorage({
+      id: uuidv4(),
+      name,
+      createdAt: new Date().toISOString(),
+      fields,
+    });
+    disptach(createForm({ name }));
+    setName("");
+    disptach(saveForm());
+    handleClose(false);
+    alert("Form saved!");
   };
 
   return (
@@ -59,7 +77,7 @@ const CreateFormDialog = () => {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel}>cancel</Button>
-        <Button onClick={handleCreate}>Create</Button>
+        <Button onClick={handleSaveForm}>Save</Button>
       </DialogActions>
     </Dialog>
   );

@@ -14,13 +14,14 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Outlet, useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 interface Props {
   window?: () => Window;
 }
 
 const drawerWidth = 240;
-const navItems = ["create", "preview", "myforms"];
+const navItems = ["create", "myforms"];
 
 export default function Layout(props: Props) {
   const { window } = props;
@@ -35,7 +36,7 @@ export default function Layout(props: Props) {
     console.log(path);
     navigate("/" + path);
   };
-  
+
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
@@ -65,7 +66,19 @@ export default function Layout(props: Props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100vh", overflow: "auto" ,justifyContent:"center"}}>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <CssBaseline />
       <AppBar component="nav">
         <Toolbar>
@@ -120,7 +133,7 @@ export default function Layout(props: Props) {
           {drawer}
         </Drawer>
       </nav>
-      <Box component="main" sx={{ p: 3 }}>
+      <Box component="main">
         <Toolbar />
         <Outlet />
       </Box>
